@@ -1,73 +1,101 @@
 // Pins mentioned here is for example and it should be given according to the connections in hardware (Arduino Nano)
-// Define IR sensor pins
+// Motor Pins
+const int ENA = 9;    // PWM pin for Left Motor Speed
+const int IN1 = 8;    // Left Motor direction pin 1
+const int IN2 = 7;    // Left Motor direction pin 2
+
+const int ENB = 10;   // PWM pin for Right Motor Speed
+const int IN3 = 6;    // Right Motor direction pin 1
+const int IN4 = 5;    // Right Motor direction pin 2
+
+// IR Sensor Pins
 const int leftSensor = 2;
 const int rightSensor = 3;
 
-// Motor control pins
-const int in1 = 4;
-const int in2 = 5;
-const int in3 = 6;
-const int in4 = 7;
+// Speed Control
+int motorSpeed = 150; // Value between 0 - 255
 
 void setup() {
-  // Set IR sensors as input
+  // Motor pins as OUTPUT
+  pinMode(ENA, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(ENB, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+
+  // IR sensor pins as INPUT
   pinMode(leftSensor, INPUT);
   pinMode(rightSensor, INPUT);
 
-  // Set motor pins as output
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
-  pinMode(in3, OUTPUT);
-  pinMode(in4, OUTPUT);
+  // Start Serial Monitor
+  Serial.begin(9600);
 }
 
 void loop() {
-  int left = digitalRead(leftSensor);
-  int right = digitalRead(rightSensor);
+  int leftIR = digitalRead(leftSensor);
+  int rightIR = digitalRead(rightSensor);
 
-  // Case 1: Both sensors on track (black)
-  if (left == LOW && right == LOW) {
+  // Debugging output
+  Serial.print("Left: ");
+  Serial.print(leftIR);
+  Serial.print(" | Right: ");
+  Serial.println(rightIR);
+
+  // Decision logic
+  if (leftIR == 0 && rightIR == 0) {
+    // Both sensors on black line
     moveForward();
   }
-  // Case 2: Left sensor off track (white), turn right
-  else if (left == HIGH && right == LOW) {
-    turnRight();
-  }
-  // Case 3: Right sensor off track, turn left
-  else if (left == LOW && right == HIGH) {
+  else if (leftIR == 0 && rightIR == 1) {
+    // Left on line, right off line → turn left
     turnLeft();
   }
-  // Case 4: Both off track - stop or turn
+  else if (leftIR == 1 && rightIR == 0) {
+    // Right on line, left off line → turn right
+    turnRight();
+  }
   else {
+    // Both sensors off line → stop
     stopMotors();
   }
+
+  delay(100);  // Small delay for stability
 }
 
-// Movement functions
+// Function Definitions
+
 void moveForward() {
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
-}
+  analogWrite(ENA, motorSpeed);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
 
-void turnRight() {
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
+  analogWrite(ENB, motorSpeed);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
 }
 
 void turnLeft() {
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);
+  analogWrite(ENA, motorSpeed);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH); // Left motor backward
+
+  analogWrite(ENB, motorSpeed);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW); // Right motor forward
+}
+
+void turnRight() {
+  analogWrite(ENA, motorSpeed);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW); // Left motor forward
+
+  analogWrite(ENB, motorSpeed);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH); // Right motor backward
 }
 
 void stopMotors() {
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);
+  analogWrite(ENA, 0);
+  analogWrite(ENB, 0);
 }
