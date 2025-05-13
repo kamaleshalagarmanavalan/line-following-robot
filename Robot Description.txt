@@ -1,0 +1,8 @@
+This line-following robot is designed using an Arduino Nano mounted on a custom-designed PCB that integrates both motor driver circuitry and sensor interfaces. 
+The PCB houses the L298N motor driver IC, which controls two DC motors responsible for the robot’s left and right wheel movements.
+Essential power regulation components such as resistors, capacitors, and LEDs are included for circuit stability and status indication. 
+Screw terminals make motor and sensor connections neat and secure. The robot employs two blue-light infrared (IR) sensors developed by Sparrow Innovation, Tamil Nadu. 
+These sensors detect the black line on the ground and provide digital feedback to the microcontroller, allowing the robot to follow the path intelligently by adjusting motor speed and direction.
+The entire setup is mounted on a red acrylic chassis, which serves as a sturdy base frame for holding the electronics, motors, and wheels.
+The chassis supports two main wheels for motion and a front caster wheel to maintain balance during turns.
+The robot is currently powered via USB connection for programming and testing, but it is designed to work with a battery pack for untethered operation in real-world applications.
